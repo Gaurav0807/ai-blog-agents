@@ -18,6 +18,7 @@ jobs:
       - name: Checkout AI Agent Repo
         uses: actions/checkout@v4
         with:
+          repository: Gaurav0807/ai-blog-agents
           path: ai-agent
 
       - name: Checkout Target Repo
