@@ -20,7 +20,6 @@ jobs:
         with:
           repository: ${{ inputs.target_repo }}
           ref: ${{ inputs.target_branch }}
-          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
