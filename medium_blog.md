@@ -20,38 +20,34 @@ The architecture of **ai-blog-agents** is designed for seamless integration with
 
 4. **Agent**: The main execution point that orchestrates the blog generation process, invoking the necessary components and managing the workflow.
 
-## Key Components
-
-### BlogState
-
-The `BlogState` class is a Pydantic model that encapsulates the various states during the blog generation process. It includes:
-
-- **readme**: The content of the README file from the repository.
-- **code_context**: Snippets of code or relevant information extracted from the repository.
-- **blog**: The generated blog content.
-- **score**: A metric to evaluate the quality of the generated blog.
-- **rewrite_count**: A counter to track how many times the blog content has been rewritten.
-
-### LLM Setup
-
-The `get_llm` function initializes the language model using the OpenAI API. It ensures that the API key is set and configures parameters such as temperature and maximum tokens to control the output style and length.
-
-### Repo Loader
-
-The `load_readme` and `load_code_context` functions work together to extract relevant information from the repository. The `load_readme` function reads the README file, while `load_code_context` traverses the repository to collect code snippets, ensuring a rich context for the AI to work with.
-
-### Agent
-
-The `agent.py` file serves as the entry point for the application. It changes the working directory to the target repository and invokes the blog generation process by building the graph and passing the `BlogState`.
-
-## How It Works
-
-The **ai-blog-agents** system operates in a series of well-defined steps:
+### High-Level Workflow
 
 1. **Initialization**: The agent is triggered, either manually or through a GitHub action. It sets up the environment and prepares to analyze the target repository.
 
 2. **Data Loading**: The `Repo Loader` extracts the README and code context, storing them in the `BlogState`.
 
-3. **Blog Generation**: The AI model utilizes the information from the `BlogState` to generate a structured blog, following a predefined template that includes sections such as a catchy title, introduction, problem statement, architecture overview, key components, and real-world use cases.
+3. **Blog Generation**: The AI model utilizes the information from the `BlogState` to generate a structured blog, following a predefined template.
 
-4. **Output**: The generated blog
+4. **Output**: The generated blog is evaluated for quality, and if necessary, rewritten before being saved to a markdown file.
+
+## Key Features
+
+- **Automated Content Generation**: By leveraging AI, **ai-blog-agents** can create structured blogs that capture the essence of the codebase without manual input.
+  
+- **Quality Evaluation**: The system includes a scoring mechanism to assess the quality of generated content, ensuring that only high-quality blogs are published.
+
+- **Rewriting Capability**: If the initial output doesn't meet quality standards, the system can automatically rewrite the blog to improve clarity and engagement.
+
+- **Integration with GitHub Actions**: Developers can trigger the blog generation process directly from their GitHub repositories, streamlining the workflow.
+
+## Use Cases
+
+- **Documentation Generation**: Automatically generate detailed documentation for open source projects, making it easier for new contributors to understand the codebase.
+
+- **Technical Blogging**: Developers can quickly create blog posts about their projects, sharing insights and updates with the community without the overhead of manual writing.
+
+- **Educational Content**: Create tutorials or guides based on existing code, helping others learn from real-world examples.
+
+## Conclusion
+
+The **ai-blog-agents** project represents a significant step forward in automating technical blogging and documentation generation. By harnessing the power of AI, developers can save time and effort while still producing high-quality content that benefits the community. Whether you're looking to document your open-source project or share insights from your latest coding adventure, **ai-blog-agents** is here to help. Embrace the future of technical blogging and
