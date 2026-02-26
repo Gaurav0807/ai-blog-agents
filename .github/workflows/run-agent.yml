@@ -10,19 +10,22 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: write
-
 jobs:
   generate_blog:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout target repo
+
+      - name: Checkout AI Agent Repo
+        uses: actions/checkout@v4
+
+      - name: Checkout Target Repo
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.target_repo }}
           ref: ${{ inputs.target_branch }}
+          path: target-repo
+          # token: ${{ secrets.PAT_TOKEN }}
 
 
       - name: Setup Python
@@ -30,18 +33,20 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
 
       - name: Run AI Agent
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: |
-          python agent.py
+        run: python agent.py target-repo
 
-      - name: Commit Blog
+      # 6️⃣ Commit blog back to target repo
+      - name: Commit blog to target repo
         run: |
+          cd target-repo
           git config user.name "Gaurav0807"
           git config user.email "gauravrawat141999@gmail.com"
           git add medium_blog.md
