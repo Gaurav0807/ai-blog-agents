@@ -9,6 +9,9 @@ on:
       target_branch:
         required: true
         type: string
+    secrets:
+      OPENROUTER_API_KEY:
+        required: true
 
 jobs:
   generate_blog:
@@ -51,3 +54,4 @@ jobs:
           git add medium_blog.md
           git commit -m "docs(ai): auto-generate for medium blog" || echo "No changes"
           git push
+
