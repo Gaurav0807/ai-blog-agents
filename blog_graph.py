@@ -46,33 +46,33 @@ def generate_blog(state: BlogState) -> BlogState:
     llm = get_llm()
 
     prompt = PromptTemplate.from_template("""
-You are a senior developer writing a high-quality Medium technical blog.
+    You are a senior developer writing a high-quality Medium technical blog.
 
-Convert this GitHub repository into a structured blog.
+    Convert this GitHub repository into a structured blog.
 
-Required Sections:
-- Catchy Title
-- Introduction
-- Problem Statement
-- Architecture Overview
-- Key Components
-- How It Works
-- Real-world Use Cases
-- How to Run Locally
-- Conclusion
+    Required Sections:
+    - Catchy Title
+    - Introduction
+    - Problem Statement
+    - Architecture Overview
+    - Key Components
+    - How It Works
+    - Real-world Use Cases
+    - How to Run Locally
+    - Conclusion
 
-Rules:
-- Do NOT generate images
-- Use proper formatting
-- Ensure the article is fully complete
-- Maintain a friendly developer tone
+    Rules:
+    - Do NOT generate images
+    - Use proper formatting
+    - Ensure the article is fully complete
+    - Maintain a friendly developer tone
 
-README:
-{readme}
+    README:
+    {readme}
 
-Codebase Summary:
-{code_context}
-""")
+    Codebase Summary:
+    {code_context}
+    """)
 
     chain = prompt | llm | StrOutputParser()
 
@@ -89,19 +89,18 @@ def evaluate_blog(state: BlogState) -> BlogState:
     llm = get_llm()
 
     prompt = f"""
-Rate the following blog from 1 to 10.
+    Rate the quality of the following blog from 1 to 10.
 
-Criteria:
-- Clear structure
-- Proper spacing
-- Complete article (not cut off)
-- Technical clarity
+    Criteria:
+    - Clear structure
+    - Proper spacing
+    - Technical clarity
+    Return ONLY a number. Give number based on proper spacing and proper read able content.Also Make sure blog is completed not half way done
 
-Return ONLY a number.
 
-Blog:
-{state.blog}
-"""
+    Blog:
+    {state.blog}
+    """
 
     response = llm.invoke(prompt).content.strip()
 
@@ -118,12 +117,12 @@ def rewrite_blog(state: BlogState) -> BlogState:
     llm = get_llm()
 
     prompt = f"""
-Improve this blog to increase clarity, engagement, and structure.
-Ensure it is complete and properly formatted.
+    Improve this blog to increase clarity, engagement, and structure.
+    Ensure it is complete and properly formatted.
 
-Blog:
-{state.blog}
-"""
+    Blog:
+    {state.blog}
+    """       
 
     state.blog = llm.invoke(prompt).content
     state.rewrite_count += 1
