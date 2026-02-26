@@ -42,11 +42,11 @@ jobs:
           ls -la
 
       - name: Install dependencies
-        working-directory: ${{ github.action_path }}/../..
+        working-directory: ${{ github.workspace }}
         run: pip install -r requirements.txt
 
       - name: Run AI Agent
-        working-directory: ${{ github.action_path }}/../..
+        working-directory: ${{ github.workspace }}
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: python agent.py target-repo
