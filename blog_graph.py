@@ -19,10 +19,8 @@ class BlogState(BaseModel):
     rewrite_count: int = Field(default=0)
 
 
-# ---------------------------
-# LLM Setup
-# ---------------------------
 
+# LLM Setup
 def get_llm():
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
@@ -110,7 +108,7 @@ Blog:
     try:
         state.score = int(response)
     except:
-        state.score = 6  # Safe fallback
+        state.score = 6
 
     print(f"📊 Blog Quality Score: {state.score}/10")
     return state
