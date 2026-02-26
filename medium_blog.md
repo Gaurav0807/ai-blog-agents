@@ -12,49 +12,50 @@ As developers, we frequently juggle multiple responsibilities, from coding and d
 
 The architecture of **ai-blog-agents** is designed for seamless integration with GitHub repositories. It consists of several key components:
 
-1. **BlogState**: A data model that holds the state of the blog generation process, including the README content, code context, generated blog content, and other relevant metadata.
-2. **LLM Setup**: Utilizes a language model to generate blog content based on the analyzed repository data.
-3. **Repository Loader**: A utility to load README files and relevant code snippets from the repository.
-4. **Workflow Automation**: GitHub Actions that automate the blog generation process upon specific triggers.
+1. **BlogState**: A data model that holds the state of the blog generation process, including the README content, code context, generated blog content, a score for the quality of the generated content, and the number of rewrites.
+
+2. **LLM (Language Model)**: The AI engine that generates the blog content based on the extracted information from the repository.
+
+3. **Repo Loader**: A module responsible for loading the README and code context from the repository, filtering out irrelevant files and directories.
+
+4. **Agent**: The main script that orchestrates the blog generation process by invoking the various components.
 
 ## Key Components
 
 ### BlogState
 
-The `BlogState` class is a core component that encapsulates the necessary data for generating a blog post. It includes:
+The `BlogState` class encapsulates all necessary information for generating the blog, including:
 
 - `readme`: The content of the README file.
-- `code_context`: Snippets of code that provide context for the blog.
+- `code_context`: Relevant code snippets and context from the repository.
 - `blog`: The generated blog content.
-- `score`: A quality score for the generated content.
-- `rewrite_count`: The number of times the blog content has been rewritten.
+- `score`: A metric to evaluate the quality of the generated content.
+- `rewrite_count`: The number of times the content has been rewritten to improve quality.
 
-### LLM Setup
+### Language Model (LLM)
 
-The language model setup is crucial for generating high-quality content. It retrieves an API key from the environment and initializes the model with specific parameters like temperature and token limits.
+The LLM is set up to interact with the OpenRouter API, enabling it to generate high-quality content. It utilizes a customizable prompt template that structures the blog into defined sections, ensuring a coherent flow of information.
 
-### Repository Loader
+### Repo Loader
 
-The repository loader is responsible for fetching the README and relevant code files. It ensures that only valid files are processed, ignoring unnecessary directories to keep the content focused and relevant.
+The `repo_loader` module is responsible for traversing the repository's directory structure, loading relevant files while ignoring unnecessary ones (like `.git` or `node_modules`). It extracts the README content and relevant code snippets, which are crucial for generating a meaningful blog post.
 
-### Workflow Automation
+### Agent
 
-The project utilizes GitHub Actions to automate the blog generation process. Whenever a developer pushes changes to the main branch with a specific commit message, the workflow triggers the blog generation, ensuring that the latest updates are reflected in the blog content.
+The `agent.py` script serves as the entry point for running the blog generation process. It initializes the `BlogState`, changes the working directory to the target repository, and invokes the blog generation workflow.
 
 ## How It Works
 
-The **ai-blog-agents** workflow begins with the developer pushing changes to a GitHub repository. If the commit message contains the keyword 'ai-blog', the GitHub Actions workflow is triggered. The following steps occur:
+1. **Initialization**: When the agent is run, it initializes a `BlogState` instance and loads the README and code context from the repository.
 
-1. The repository is checked out, and the Python environment is set up.
-2. The `agent.py` script is executed, which initializes the `BlogState` and invokes the blog generation process.
-3. The repository loader retrieves the README and relevant code snippets.
-4. The language model generates a structured blog post based on the retrieved data.
-5. The generated blog is committed back to the repository, making it available for others to read.
+2. **Content Generation**: The loaded data is passed to the LLM, which generates a structured blog post based on the provided prompt template.
+
+3. **Quality Assessment**: The generated content is evaluated using a scoring system. If the score falls below a defined threshold, the content can be rewritten up to a specified number of times to enhance quality.
+
+4. **Output**: Once the content meets the quality criteria, it is saved as a Markdown file (`medium_blog.md`) in the target repository.
 
 ## Real-world Use Cases
 
-The **ai-blog-agents** project can be beneficial in various real-world scenarios:
+1. **Open Source Projects**: Developers can leverage **ai-blog-agents** to automatically generate documentation and blog posts for their open-source projects, making it easier to share knowledge with the community.
 
-1. **Open Source Projects**: Contributors can automatically generate blog posts to document their projects, making it easier for new users to understand how to use them.
-2. **Personal Projects**: Developers can maintain a blog that reflects their latest projects and learnings, providing a platform for sharing insights with the community.
-3. **Educational Purposes**: Instructors can use
+2. **Personal Projects**:
