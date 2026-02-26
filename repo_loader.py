@@ -15,9 +15,9 @@ def load_readme() -> str:
 
 def load_code_context(max_chars: int = 12000) -> str:
     chunks = []
+    total_chars = 0
 
     for root, dirs, files in os.walk("."):
-        # Remove ignored directory
         dirs[:] = [d for d in dirs if d not in IGNORE_DIRS]
 
         for file in files:
@@ -26,11 +26,17 @@ def load_code_context(max_chars: int = 12000) -> str:
 
                 try:
                     content = file_path.read_text(encoding="utf-8")
-                    chunks.append(
-                        f"\n\n### File: {file_path}\n{content[:1500]}"
-                    )
+                    block = f"\n\n### File: {file_path}\n{content}"
+
+                    if total_chars + len(block) > max_chars:
+                        remaining = max_chars - total_chars
+                        chunks.append(block[:remaining])
+                        return "".join(chunks)
+
+                    chunks.append(block)
+                    total_chars += len(block)
+
                 except Exception:
                     continue
 
-    combined = "\n".join(chunks)
-    return combined[:max_chars]
+    return "".join(chunks)

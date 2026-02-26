@@ -90,13 +90,7 @@ def evaluate_blog(state: BlogState) -> BlogState:
 
     prompt = f"""
     Rate the quality of the following blog from 1 to 10.
-
-    Criteria:
-    - Clear structure
-    - Proper spacing
-    - Technical clarity
-    Return ONLY a number. Give number based on proper spacing and proper read able content.Also Make sure blog is completed not half way done
-
+    Only return a single number. Give number based on proper spacing and proper read able content.Also Make sure blog is completed not half way done
 
     Blog:
     {state.blog}
