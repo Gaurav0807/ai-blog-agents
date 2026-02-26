@@ -48,24 +48,17 @@ def generate_blog(state: BlogState) -> BlogState:
     prompt = PromptTemplate.from_template("""
     You are a senior developer writing a high-quality Medium technical blog.
 
-    Convert this GitHub repository into a structured blog.
-
-    Required Sections:
-    - Catchy Title
-    - Introduction
-    - Problem Statement
-    - Architecture Overview
-    - Key Components
-    - How It Works
-    - Real-world Use Cases
-    - How to Run Locally
+    Requirements:
+    - Catchy title
+    - Clear intro
+    - Architecture overview
+    - Key features
+    - Use cases
     - Conclusion
+    - Friendly developer tone
 
-    Rules:
-    - Do NOT generate images
-    - Use proper formatting
-    - Ensure the article is fully complete
-    - Maintain a friendly developer tone
+    Please Don't create Image Just architecture and highlevel about everything. Also do proper formatting of the article
+
 
     README:
     {readme}
