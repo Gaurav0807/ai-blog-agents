@@ -109,7 +109,7 @@ def evaluate_blog(state: BlogState) -> BlogState:
     except:
         state.score = 6
 
-    print(f"📊 Blog Quality Score: {state.score}/10")
+    print(f" Blog Quality Score: {state.score}/10")
     return state
 
 
@@ -127,7 +127,7 @@ def rewrite_blog(state: BlogState) -> BlogState:
     state.blog = llm.invoke(prompt).content
     state.rewrite_count += 1
 
-    print(f"✍️ Rewrite attempt #{state.rewrite_count}")
+    print(f" Rewrite attempt #{state.rewrite_count}")
     return state
 
 
@@ -135,7 +135,7 @@ def save_blog(state: BlogState) -> BlogState:
     with open("medium_blog.md", "w", encoding="utf-8") as f:
         f.write(state.blog)
 
-    print("💾 medium_blog.md saved successfully")
+    print(" medium_blog.md format saved successfully")
     return state
 
 
