@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout AI Agent Repo
         uses: actions/checkout@v4
+        with:
+          path: ai-agent
 
       - name: Checkout Target Repo
         uses: actions/checkout@v4
@@ -24,7 +26,6 @@ jobs:
           repository: ${{ inputs.target_repo }}
           ref: ${{ inputs.target_branch }}
           path: target-repo
-          # token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -32,24 +33,14 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          cd $GITHUB_WORKSPACE
-          pip install -r requirements.txt
-
-      - name: Debug files
-        run: |
-          pwd
-          ls -la
-
-      - name: Install dependencies
-        working-directory: ${{ github.workspace }}
+        working-directory: ai-agent
         run: pip install -r requirements.txt
 
       - name: Run AI Agent
-        working-directory: ${{ github.workspace }}
+        working-directory: ai-agent
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: python agent.py target-repo
+        run: python agent.py ../target-repo
 
       - name: Commit blog to target repo path
         run: |
