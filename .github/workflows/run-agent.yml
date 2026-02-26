@@ -45,7 +45,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: python agent.py target-repo
 
-      - name: Commit blog to target repo
+      - name: Commit blog to target repo path
         run: |
           cd target-repo
           git config user.name "Gaurav0807"
