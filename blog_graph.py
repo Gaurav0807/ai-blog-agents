@@ -29,11 +29,11 @@ def get_llm():
         raise ValueError("OPENROUTER_API_KEY is required")
 
     return ChatOpenAI(
-        model="mistralai/mistral-7b-instruct",
+        model="openai/gpt-4o-mini",
         api_key=api_key,
         base_url="https://openrouter.ai/api/v1",
         temperature=0.5,
-        max_tokens=1400,
+        max_tokens=800,
     )
 
 
