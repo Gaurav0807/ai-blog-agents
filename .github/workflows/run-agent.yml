@@ -31,6 +31,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install dependencies
+        run: |
+          cd $GITHUB_WORKSPACE
+          pip install -r requirements.txt
+
       - name: Debug files
         run: |
           pwd
@@ -43,7 +48,9 @@ jobs:
       - name: Run AI Agent
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: python agent.py target-repo
+        run: |
+          cd $GITHUB_WORKSPACE
+          python agent.py target-repo
 
       - name: Commit blog to target repo path
         run: |
