@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout AI Agent Repo
         uses: actions/checkout@v4
 
@@ -27,23 +26,25 @@ jobs:
           path: target-repo
           # token: ${{ secrets.PAT_TOKEN }}
 
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Debug files
+        run: |
+          pwd
+          ls -la
 
       - name: Install dependencies
+        working-directory: ${{ github.workspace }}
         run: pip install -r requirements.txt
-
 
       - name: Run AI Agent
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: python agent.py target-repo
 
-      # 6️⃣ Commit blog back to target repo
       - name: Commit blog to target repo
         run: |
           cd target-repo
