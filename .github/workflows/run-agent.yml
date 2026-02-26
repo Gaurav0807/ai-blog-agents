@@ -1,0 +1,46 @@
+name: Central AI Blog Agent
+
+on:
+  workflow_call:
+    inputs:
+      target_repo:
+        required: true
+        type: string
+      target_branch:
+        required: true
+        type: string
+
+jobs:
+  generate_blog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.target_repo }}
+          ref: ${{ inputs.target_branch }}
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run AI Agent
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python agent.py
+
+      - name: Commit Blog
+        run: |
+          git config user.name "Gaurav0807"
+          git config user.email "gauravrawat141999@gmail.com"
+          git add medium_blog.md
+          git commit -m "docs(ai): auto-generate Medium blog" || echo "No changes"
+          git push
