@@ -51,3 +51,11 @@ The architecture of **ai-blog-agents** is designed for seamless integration with
 ## Conclusion
 
 The **ai-blog-agents** project represents a significant step forward in automating technical blogging and documentation generation. By harnessing the power of AI, developers can save time and effort while still producing high-quality content that benefits the community. Whether you're looking to document your open-source project or share insights from your latest coding adventure, **ai-blog-agents** is here to help. Embrace the future of technical blogging and
+
+## 🚀 Latest Updates (2026-03-23)
+- Added `trigger_sha` input to GitHub Actions workflows.
+- Set `fetch-depth: 0` to clone the entire repository history.
+- Introduced a debug info step to log repository details including `trigger_sha`.
+- Modified the commit step to only commit if there are changes detected.
+- Added a validation step to check if the blog file was generated.
+- Updated `agent.py` to print the `TRIGGER_SHA` environment variable.
