@@ -32,11 +32,16 @@ def load_existing_blog():
     return ""
 
 
+
 def load_git_changes(trigger_sha: str):
     last_commit = get_last_blog_commit()
 
+    import subprocess
+
+    if not trigger_sha:
+        trigger_sha = "HEAD"
+
     if not last_commit:
-        # First run
         commits = subprocess.check_output(
             ["git", "log", "-n", "20", "--pretty=format:%h - %s"]
         ).decode()
@@ -47,14 +52,23 @@ def load_git_changes(trigger_sha: str):
 
         return commits, diff
 
-    # Incremental mode
-    commits = subprocess.check_output(
-        ["git", "log", f"{last_commit}..{trigger_sha}", "--pretty=format:%h - %s"]
-    ).decode()
+    try:
+        commits = subprocess.check_output(
+            ["git", "log", f"{last_commit}..{trigger_sha}", "--pretty=format:%h - %s"]
+        ).decode()
 
-    diff = subprocess.check_output(
-        ["git", "diff", f"{last_commit}..{trigger_sha}"]
-    ).decode()
+        diff = subprocess.check_output(
+            ["git", "diff", f"{last_commit}..{trigger_sha}"]
+        ).decode()
+
+    except subprocess.CalledProcessError:
+        commits = subprocess.check_output(
+            ["git", "log", "-n", "10", "--pretty=format:%h - %s"]
+        ).decode()
+
+        diff = subprocess.check_output(
+            ["git", "diff"]
+        ).decode()
 
     return commits, diff
 
