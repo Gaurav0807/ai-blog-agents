@@ -12,11 +12,17 @@ MAX_REWRITES = 2
 
 
 class BlogState(BaseModel):
-    readme: str = Field(default="")
-    code_context: str = Field(default="")
+    #readme: str = Field(default="")
+    #code_context: str = Field(default="")
     blog: str = Field(default="")
     score: int = Field(default=0)
     rewrite_count: int = Field(default=0)
+    readme: str = ""
+    code_context: str = ""
+    existing_blog: str = ""
+    commits: str = "" 
+    diff: str = "" 
+
 
 
 
@@ -36,43 +42,136 @@ def get_llm():
 
 
 # Nodes
+# def load_repo(state: BlogState) -> BlogState:
+#     state.readme = load_readme()
+#     state.code_context = load_code_context()
+#     return state
+
 def load_repo(state: BlogState) -> BlogState:
+    from repo_loader import load_readme, load_code_context, load_existing_blog,load_git_changes
+
     state.readme = load_readme()
-    state.code_context = load_code_context()
+    state.code_context = load_code_context(max_chars=10000)
+
+    state.existing_blog = load_existing_blog()
+
+    import os
+    trigger_sha = os.getenv("TRIGGER_SHA")
+
+    commits, diff = load_git_changes(trigger_sha)
+
+    state.commits = commits
+    state.diff = diff[:20000]  # truncate for LLM
+
+    #Skip
+    if not commits.strip():
+        print("No new changes detected. Skipping blog generation.")
+        exit(0)
+
     return state
+
+
+# def generate_blog(state: BlogState) -> BlogState:
+#     llm = get_llm()
+
+#     prompt = PromptTemplate.from_template("""
+#     You are a senior developer writing a high-quality Medium technical blog.
+
+#     Requirements:
+#     - Catchy title
+#     - Clear intro
+#     - Architecture overview
+#     - Key features
+#     - Use cases
+#     - Conclusion
+#     - Friendly developer tone
+
+#     Please Don't create Image Just architecture and highlevel about everything. Also do proper formatting of the article
+
+
+#     README:
+#     {readme}
+
+#     Codebase Summary:
+#     {code_context}
+#     """)
+
+#     chain = prompt | llm | StrOutputParser()
+
+#     state.blog = chain.invoke({
+#         "readme": state.readme,
+#         "code_context": state.code_context
+#     })
+
+#     print("✅ Blog generated")
+#     return state
+
 
 
 def generate_blog(state: BlogState) -> BlogState:
     llm = get_llm()
 
-    prompt = PromptTemplate.from_template("""
-    You are a senior developer writing a high-quality Medium technical blog.
+    if state.existing_blog:
+        # 🔥 Incremental mode
+        prompt = PromptTemplate.from_template("""
+        You are a senior developer updating an existing blog.
 
-    Requirements:
-    - Catchy title
-    - Clear intro
-    - Architecture overview
-    - Key features
-    - Use cases
-    - Conclusion
-    - Friendly developer tone
+        Existing Blog:
+        {existing_blog}
 
-    Please Don't create Image Just architecture and highlevel about everything. Also do proper formatting of the article
+        New Commits:
+        {commits}
+
+        Code Changes:
+        {diff}
+
+        Task:
+        - DO NOT rewrite entire blog
+        - ONLY add a new section: "## Latest Updates"
+        - Summarize meaningful changes only
+        - Ignore minor/formatting changes
+        - Keep it concise and structured
+        """)
+
+        inputs = {
+            "existing_blog": state.existing_blog,
+            "commits": state.commits,
+            "diff": state.diff
+        }
+
+    else:
+        # First-time generation
+        prompt = PromptTemplate.from_template("""
+        You are a senior developer writing a high-quality Medium blog.
+
+        You are a senior developer writing a high-quality Medium technical blog.
+
+        Requirements:
+        - Catchy title
+        - Clear intro
+        - Architecture overview
+        - Key features
+        - Use cases
+        - Conclusion
+        - Friendly developer tone
+
+        Please Don't create Image Just architecture and highlevel about everything. Also do proper formatting of the article
 
 
-    README:
-    {readme}
+        README:
+        {readme}
 
-    Codebase Summary:
-    {code_context}
-    """)
+        Codebase Summary:
+        {code_context}
+        """)
+
+        inputs = {
+            "readme": state.readme,
+            "code_context": state.code_context
+        }
 
     chain = prompt | llm | StrOutputParser()
-
-    state.blog = chain.invoke({
-        "readme": state.readme,
-        "code_context": state.code_context
-    })
+    state.blog = chain.invoke(inputs)
 
     print("✅ Blog generated")
     return state
@@ -118,13 +217,27 @@ def rewrite_blog(state: BlogState) -> BlogState:
     return state
 
 
+# def save_blog(state: BlogState) -> BlogState:
+#     with open("medium_blog.md", "w", encoding="utf-8") as f:
+#         f.write(state.blog)
+
+#     print(" medium_blog.md format saved successfully")
+#     return state
+
 def save_blog(state: BlogState) -> BlogState:
-    with open("medium_blog.md", "w", encoding="utf-8") as f:
-        f.write(state.blog)
+    path = "medium_blog.md"
 
-    print(" medium_blog.md format saved successfully")
+    if state.existing_blog:
+        # Append mode
+        with open(path, "a", encoding="utf-8") as f:
+            f.write("\n\n" + state.blog)
+    else:
+        # First time write
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(state.blog)
+
+    print("✅ Blog saved incremental ")
     return state
-
 
 
 #Router

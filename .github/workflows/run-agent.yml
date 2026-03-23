@@ -9,6 +9,9 @@ on:
       target_branch:
         required: true
         type: string
+      trigger_sha:
+        required: true
+        type: string
     secrets:
       OPENROUTER_API_KEY:
         required: true
@@ -40,18 +43,46 @@ jobs:
         working-directory: ai-agent
         run: pip install -r requirements.txt
 
+      - name: Debug Info
+        run: |
+          echo "Repo: ${{ inputs.target_repo }}"
+          echo "Branch: ${{ inputs.target_branch }}"
+          echo "Trigger SHA: ${{ inputs.trigger_sha }}"
+
       - name: Run AI Agent
         working-directory: ai-agent
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TRIGGER_SHA: ${{ inputs.trigger_sha }}
         run: python agent.py ../target-repo
 
+      # - name: Commit blog to target repo path
+      #   run: |
+      #     cd target-repo
+      #     git config user.name "Gaurav0807"
+      #     git config user.email "gauravrawat141999@gmail.com"
+      #     git add medium_blog.md
+      #     git commit -m "docs(ai): auto-generate for medium blog" || echo "No changes"
+      #     git push
+      
       - name: Commit blog to target repo path
         run: |
           cd target-repo
+
           git config user.name "Gaurav0807"
           git config user.email "gauravrawat141999@gmail.com"
+
           git add medium_blog.md
-          git commit -m "docs(ai): auto-generate for medium blog" || echo "No changes"
-          git push
+
+          # Only commit if there are real changes
+          if ! git diff --cached --quiet; then
+            git commit -m "docs(ai): auto-generate for medium blog"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+      
+      - name: Validate blog generated
+        run: |
+          test -f target-repo/medium_blog.md || (echo "Blog not generated" && exit 1)
 
